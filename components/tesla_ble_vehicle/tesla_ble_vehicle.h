@@ -1,8 +1,5 @@
 #pragma once
 
-#include "mbedtls/ecdsa.h"
-#include "mbedtls/sha256.h"
-#include "mbedtls/ctr_drbg.h"
 #include <memory>
 #include <map>
 #include <string>
@@ -80,17 +77,13 @@ public:
     void set_pair_button(button::Button *button);
     void set_regenerate_key_button(button::Button *button);
     void set_force_update_button(button::Button *button);
-    void set_start_driving_button(button::Button *button); // New Setter
+    void set_start_driving_button(button::Button *button);
 
     int wake_vehicle();
     int start_pairing();
     int regenerate_key();
     void force_update();
-    void start_driving(); // New Action
-
-    // 新增：处理授权挑战与发送授权响应
-    void handle_authorization_challenge(const std::vector<uint8_t> &challenge_data);
-    void send_authorization_response();
+    void start_driving();
 
     int set_charging_state(bool charging);
     int set_charging_amps(int amps);
@@ -291,7 +284,6 @@ template<typename... Ts> class SetChargingLimitAction : public Action<Ts...> {
 public: SetChargingLimitAction(TeslaBLEVehicle *parent) : parent_(parent) {} void set_limit(esphome::TemplatableValue<int, Ts...> limit) { limit_ = limit; } void play(Ts... x) override { parent_->set_charging_limit(limit_.value(x...)); } protected: TeslaBLEVehicle *parent_; esphome::TemplatableValue<int, Ts...> limit_;
 };
 
-// ★ 新增：StartDrivingAction5.3
 template<typename... Ts> class StartDrivingAction : public Action<Ts...> {
 public:
     explicit StartDrivingAction(TeslaBLEVehicle *parent) : parent_(parent) {}
