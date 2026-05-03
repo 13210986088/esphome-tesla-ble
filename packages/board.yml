@@ -1,0 +1,10 @@
+esp32:
+  board: $board
+  variant: $variant
+  flash_size: $flash_size
+  framework:
+    type: esp-idf
+    components:
+      - name: tesla-ble
+        source: https://github.com/13210986088/tesla-ble.git
+        ref: v5.0.3
