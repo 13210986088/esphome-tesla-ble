@@ -6,9 +6,6 @@
 #include <esp_log.h>
 #include <esphome/core/helpers.h>
 #include <tb_utils.h>
-#include "mbedtls/ecdsa.h"
-#include "mbedtls/sha256.h"
-#include "mbedtls/ctr_drbg.h"
 
 namespace esphome {
 namespace tesla_ble_vehicle {
@@ -59,12 +56,6 @@ void TeslaBLEVehicle::initialize_managers() {
   vehicle_->set_drive_state_callback([this](const CarServer_DriveState &s) { if (state_manager_) state_manager_->update_drive_state(s); });
   vehicle_->set_tire_pressure_state_callback([this](const CarServer_TirePressureState &s) { if (state_manager_) state_manager_->update_tire_pressure_state(s); });
   vehicle_->set_closures_state_callback([this](const CarServer_ClosuresState &s) { if (state_manager_) state_manager_->update_closures_state(s); });
-
-  // 注册授权挑战回调
-  vehicle_->set_authorization_challenge_callback([this](const std::vector<uint8_t> &data) {
-    this->handle_authorization_challenge(data);
-  });
-
   ESP_LOGD(TAG, "All components initialized");
 }
 
@@ -164,36 +155,6 @@ void TeslaBLEVehicle::start_driving() {
     vehicle_->start_driving();
   } else {
     ESP_LOGE(TAG, "Vehicle 实例不可用");
-  }
-}
-
-void TeslaBLEVehicle::send_authorization_response() {
-  ESP_LOGI(TAG, "发送防盗授权响应...");
-  if (vehicle_) {
-    vehicle_->vcsec_poll();
-    ESP_LOGI(TAG, "授权响应已触发（VCSEC poll）");
-  } else {
-    ESP_LOGE(TAG, "Vehicle 实例不可用");
-  }
-}
-
-void TeslaBLEVehicle::handle_authorization_challenge(const std::vector<uint8_t> &challenge_data) {
-  ESP_LOGI(TAG, "收到 VCSEC 授权挑战，正在签名并发送响应...");
-  if (!vehicle_) {
-    ESP_LOGE(TAG, "Vehicle 实例不可用");
-    return;
-  }
-
-  std::vector<uint8_t> signature;
-  if (!vehicle_->sign_challenge(challenge_data, signature)) {
-    ESP_LOGE(TAG, "签名挑战失败");
-    return;
-  }
-
-  if (!vehicle_->send_authorization_response(signature)) {
-    ESP_LOGE(TAG, "发送授权响应失败");
-  } else {
-    ESP_LOGI(TAG, "授权响应已发送");
   }
 }
 
