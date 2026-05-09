@@ -66,23 +66,20 @@ ForceUpdateAction = tesla_ble_vehicle_ns.class_("ForceUpdateAction", automation.
 SetChargingAction = tesla_ble_vehicle_ns.class_("SetChargingAction", automation.Action)
 SetChargingAmpsAction = tesla_ble_vehicle_ns.class_("SetChargingAmpsAction", automation.Action)
 SetChargingLimitAction = tesla_ble_vehicle_ns.class_("SetChargingLimitAction", automation.Action)
-StartDrivingAction = tesla_ble_vehicle_ns.class_("StartDrivingAction", automation.Action)    # ★ 新增
+StartDrivingAction = tesla_ble_vehicle_ns.class_("StartDrivingAction", automation.Action)
 
 # Configuration constants
 CONF_VIN = "vin"
 CONF_CHARGING_AMPS_MAX = "charging_amps_max"
 CONF_ROLE = "role"
 
-# Polling configuration constants
 CONF_VCSEC_POLL_INTERVAL = "vcsec_poll_interval"
-CONF_INFOTAINMENT_POLL_INTERVAL_AWAKE = "infotainment_poll_interval_awake" 
+CONF_INFOTAINMENT_POLL_INTERVAL_AWAKE = "infotainment_poll_interval_awake"
 CONF_INFOTAINMENT_POLL_INTERVAL_ACTIVE = "infotainment_poll_interval_active"
 CONF_INFOTAINMENT_SLEEP_TIMEOUT = "infotainment_sleep_timeout"
 
-# Tesla key roles
-# ★ 修改：添加 OWNER 角色映射
 TESLA_ROLES = {
-    "OWNER": "Keys_Role_ROLE_OWNER",                # 新增
+    "OWNER": "Keys_Role_ROLE_OWNER",
     "DRIVER": "Keys_Role_ROLE_DRIVER",
     "CHARGING_MANAGER": "Keys_Role_ROLE_CHARGING_MANAGER",
 }
@@ -105,6 +102,8 @@ BINARY_SENSORS = [
     {"id": "window_passenger_front", "name": "Window Passenger Front", "icon": "mdi:car-window-side", "device_class": "window", "disabled_by_default": True},
     {"id": "window_passenger_rear", "name": "Window Passenger Rear", "icon": "mdi:car-window-side", "device_class": "window", "disabled_by_default": True},
     {"id": "sunroof", "name": "Sunroof", "icon": "mdi:car-select", "device_class": "window", "disabled_by_default": True},
+    # ★ 新增：空调开关状态
+    {"id": "climate_on", "name": "Climate On", "icon": "mdi:air-conditioner"},
 ]
 
 SENSORS = [
@@ -122,6 +121,11 @@ SENSORS = [
     {"id": "tpms_front_right", "name": "TPMS Front Right", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
     {"id": "tpms_rear_left", "name": "TPMS Rear Left", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
     {"id": "tpms_rear_right", "name": "TPMS Rear Right", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
+    # ★ 新增：驾驶数据
+    {"id": "speed", "name": "Speed", "icon": "mdi:speedometer", "device_class": "speed", "unit": "mph", "accuracy_decimals": 1},
+    {"id": "power", "name": "Power", "icon": "mdi:flash", "device_class": "power", "unit": "kW", "accuracy_decimals": 0},
+    # ★ 新增：车内温度
+    {"id": "inside_temp", "name": "Inside Temperature", "icon": "mdi:thermometer", "device_class": "temperature", "unit": "°C", "accuracy_decimals": 1},
 ]
 
 TEXT_SENSORS = [
@@ -130,6 +134,8 @@ TEXT_SENSORS = [
     {"id": "shift_state", "name": "Shift State", "icon": "mdi:car-shift-pattern", "disabled_by_default": True},
 ]
 
+# 后续 BUTTONS, SWITCHES, LOCKS, COVERS, CLIMATE, NUMBERS 均保持不变，此处省略以节省篇幅
+# 实际使用中必须包含以下全部定义（你原来就有）
 BUTTONS = [
     {"id": "wake", "name": "Wake up", "class": TeslaWakeButton, "setter": "set_wake_button", "icon": "mdi:sleep-off"},
     {"id": "pair", "name": "Pair BLE Key", "class": TeslaPairButton, "setter": "set_pair_button", "icon": "mdi:key-wireless", "entity_category": "diagnostic"},
@@ -138,7 +144,6 @@ BUTTONS = [
     {"id": "unlatch_driver_door", "name": "Unlatch Driver Door", "class": TeslaUnlatchDriverDoorButton, "setter": None, "icon": "mdi:car-door", "disabled_by_default": True},
     {"id": "flash_lights", "name": "Flash Lights", "class": TeslaFlashLightsButton, "setter": None, "icon": "mdi:car-light-high"},
     {"id": "honk_horn", "name": "Sound Horn", "class": TeslaHonkHornButton, "setter": None, "icon": "mdi:bullhorn"},
-    # 新增驾驶授权按钮
     {"id": "start_driving", "name": "Start Driving", "class": TeslaStartDrivingButton, "setter": "set_start_driving_button", "icon": "mdi:car-key"},
 ]
 
@@ -182,9 +187,9 @@ CONFIG_SCHEMA = (
             cv.GenerateID(CONF_ID): cv.declare_id(TeslaBLEVehicle),
             cv.Required(CONF_VIN): cv.string,
             cv.Optional(CONF_CHARGING_AMPS_MAX, default=32): cv.int_range(min=1, max=48),
-            cv.Optional(CONF_ROLE, default="DRIVER"): cv.enum(TESLA_ROLES, upper=True),  # 现在支持 "OWNER", "DRIVER", "CHARGING_MANAGER"
+            cv.Optional(CONF_ROLE, default="DRIVER"): cv.enum(TESLA_ROLES, upper=True),
             cv.Optional(CONF_VCSEC_POLL_INTERVAL, default=10): cv.int_range(min=5, max=300),
-            cv.Optional(CONF_INFOTAINMENT_POLL_INTERVAL_AWAKE, default=30): cv.int_range(min=10, max=600), 
+            cv.Optional(CONF_INFOTAINMENT_POLL_INTERVAL_AWAKE, default=30): cv.int_range(min=10, max=600),
             cv.Optional(CONF_INFOTAINMENT_POLL_INTERVAL_ACTIVE, default=10): cv.int_range(min=5, max=120),
             cv.Optional(CONF_INFOTAINMENT_SLEEP_TIMEOUT, default=660): cv.int_range(min=60, max=3600),
         },
@@ -193,9 +198,8 @@ CONFIG_SCHEMA = (
     .extend(ble_client.BLE_CLIENT_SCHEMA)
 )
 
-# ... 其余代码保持不变 (create_* 函数, to_code 等) ...
 # =============================================================================
-# HELPER FUNCTIONS
+# HELPER FUNCTIONS (create_*, to_code, action registration)
 # =============================================================================
 
 def get_device_class_const(component_module, device_class_str):
@@ -421,7 +425,6 @@ async def tesla_set_charging_limit_to_code(config, action_id, template_arg, args
     cg.add(var.set_limit(template_))
     return var
 
-# ★ 新增：Start Driving Action 注册
 TESLA_START_DRIVING_ACTION_SCHEMA = cv.Schema({
     cv.Required(CONF_ID): cv.use_id(TeslaBLEVehicle),
 })
