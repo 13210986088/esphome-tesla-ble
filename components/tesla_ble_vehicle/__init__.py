@@ -122,7 +122,7 @@ SENSORS = [
     {"id": "tpms_rear_left", "name": "TPMS Rear Left", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
     {"id": "tpms_rear_right", "name": "TPMS Rear Right", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
     # ★ 新增：驾驶数据
-    {"id": "speed", "name": "Speed", "icon": "mdi:speedometer", "device_class": "speed", "unit": "mph", "accuracy_decimals": 1},
+    {"id": "speed", "name": "Speed", "icon": "mdi:speedometer", "device_class": "speed", "unit": "km/h", "accuracy_decimals": 1},
     {"id": "power", "name": "Power", "icon": "mdi:flash", "device_class": "power", "unit": "kW", "accuracy_decimals": 0},
     # ★ 新增：车内温度
     {"id": "inside_temp", "name": "Inside Temperature", "icon": "mdi:thermometer", "device_class": "temperature", "unit": "°C", "accuracy_decimals": 1},
@@ -134,8 +134,6 @@ TEXT_SENSORS = [
     {"id": "shift_state", "name": "Shift State", "icon": "mdi:car-shift-pattern", "disabled_by_default": True},
 ]
 
-# 后续 BUTTONS, SWITCHES, LOCKS, COVERS, CLIMATE, NUMBERS 均保持不变，此处省略以节省篇幅
-# 实际使用中必须包含以下全部定义（你原来就有）
 BUTTONS = [
     {"id": "wake", "name": "Wake up", "class": TeslaWakeButton, "setter": "set_wake_button", "icon": "mdi:sleep-off"},
     {"id": "pair", "name": "Pair BLE Key", "class": TeslaPairButton, "setter": "set_pair_button", "icon": "mdi:key-wireless", "entity_category": "diagnostic"},
