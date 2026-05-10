@@ -101,7 +101,6 @@ void VehicleStateManager::update_user_presence(VCSEC_UserPresence_E presence) {
 }
 
 void VehicleStateManager::update_charge_state(const CarServer_ChargeState& charge_state) {
-    // ... 保持原有逻辑不变 ...
     ESP_LOGD(STATE_MANAGER_TAG, "Updating charge state");
     if (charge_state.has_charging_state) {
         const bool was_charging = is_charging_;
@@ -211,7 +210,6 @@ void VehicleStateManager::update_climate_state(const CarServer_ClimateState& cli
     }
 }
 
-// ★ 修改后的 update_drive_state（新增速度和功率）
 void VehicleStateManager::update_drive_state(const CarServer_DriveState& drive_state) {
     ESP_LOGD(STATE_MANAGER_TAG, "Updating drive state");
 
@@ -228,20 +226,16 @@ void VehicleStateManager::update_drive_state(const CarServer_DriveState& drive_s
         }
     }
 
-    // 速度 (km/h)
-    if (drive_state.has_speed_kmh) {
-        float speed = drive_state.speed_kmh;
-        if (speed >= 0 && std::isfinite(speed)) {
-            publish_sensor("speed", speed);
-        }
+    // 速度 (km/h) —— 直接访问字段
+    float speed = drive_state.speed_kmh;
+    if (speed >= 0 && std::isfinite(speed)) {
+        publish_sensor("speed", speed);
     }
 
-    // 功率 (kW)
-    if (drive_state.has_power_kw) {
-        float power = drive_state.power_kw;
-        if (power >= 0 && std::isfinite(power)) {
-            publish_sensor("power", power);
-        }
+    // 功率 (kW) —— 直接访问字段
+    float power = drive_state.power_kw;
+    if (power >= 0 && std::isfinite(power)) {
+        publish_sensor("power", power);
     }
 }
 
@@ -253,7 +247,6 @@ void VehicleStateManager::update_tire_pressure_state(const CarServer_TirePressur
 }
 
 void VehicleStateManager::update_closures_state(const CarServer_ClosuresState& closures_state) {
-    // ... 原有代码保持不变 ...
     ESP_LOGD(STATE_MANAGER_TAG, "Updating closures state");
     if (closures_state.which_optional_door_open_driver_front) publish_binary_sensor("door_driver_front", closures_state.optional_door_open_driver_front.door_open_driver_front);
     if (closures_state.which_optional_door_open_driver_rear) publish_binary_sensor("door_driver_rear", closures_state.optional_door_open_driver_rear.door_open_driver_rear);
@@ -287,7 +280,6 @@ void VehicleStateManager::update_closures_state(const CarServer_ClosuresState& c
     if (closures_state.which_optional_locked) update_unlocked(!closures_state.optional_locked.locked);
 }
 
-// ... 其余函数（update_asleep, update_unlocked, 辅助方法等）保持不变 ...
 void VehicleStateManager::update_asleep(bool asleep) {
     if (publish_binary_sensor("asleep", asleep)) ESP_LOGI(STATE_MANAGER_TAG, "Vehicle sleep: %s", asleep ? "ASLEEP" : "AWAKE");
 }
