@@ -225,18 +225,7 @@ void VehicleStateManager::update_drive_state(const CarServer_DriveState& drive_s
             publish_sensor("odometer", odometer);
         }
     }
-
-    // 速度 (km/h) —— 直接访问字段
-    float speed = drive_state.speed_kmh;
-    if (speed >= 0 && std::isfinite(speed)) {
-        publish_sensor("speed", speed);
-    }
-
-    // 功率 (kW) —— 直接访问字段
-    float power = drive_state.power_kw;
-    if (power >= 0 && std::isfinite(power)) {
-        publish_sensor("power", power);
-    }
+    // 速度和功率暂不发布
 }
 
 void VehicleStateManager::update_tire_pressure_state(const CarServer_TirePressureState& tire_pressure_state) {
