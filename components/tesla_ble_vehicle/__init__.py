@@ -121,11 +121,9 @@ SENSORS = [
     {"id": "tpms_front_right", "name": "TPMS Front Right", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
     {"id": "tpms_rear_left", "name": "TPMS Rear Left", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
     {"id": "tpms_rear_right", "name": "TPMS Rear Right", "icon": "mdi:car-tire-alert", "device_class": "pressure", "unit": "bar", "accuracy_decimals": 1},
-    # ★ 新增：驾驶数据
-    {"id": "speed", "name": "Speed", "icon": "mdi:speedometer", "device_class": "speed", "unit": "km/h", "accuracy_decimals": 1},
-    {"id": "power", "name": "Power", "icon": "mdi:flash", "device_class": "power", "unit": "kW", "accuracy_decimals": 0},
     # ★ 新增：车内温度
     {"id": "inside_temp", "name": "Inside Temperature", "icon": "mdi:thermometer", "device_class": "temperature", "unit": "°C", "accuracy_decimals": 1},
+    # speed 和 power 暂不添加
 ]
 
 TEXT_SENSORS = [
